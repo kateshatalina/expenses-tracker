@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section, .expenses-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-delete {
+            background: #ff4757;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-delete:hover {
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .total-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .expenses-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .expense-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .expense-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .expense-info {
+            flex: 1;
+        }
+
+        .expense-description {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .expense-meta {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .expense-category {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .expense-amount {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-btn {
+            background: #4CAF50;
+        }
+
+        .reset-btn {
+            background: #ff9800;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Expense Tracker</h1>
+            <p>Track your expenses easily with this serverless application</p>
+        </div>
+
+        <div class="app">
+            <div class="form-section">
+                <h2>Add New Expense</h2>
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" placeholder="e.g., Groceries, Gas, Dinner" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="amount">Amount ($)</label>
+                        <input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select a category</option>
+                            <option value="Food">Food</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Bills">Bills</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn">Add Expense</button>
+                </form>
+            </div>
+
+            <div class="expenses-section">
+                <h2>Your Expenses</h2>
+                
+                <div class="filter-section">
+                    <h3>Filter Expenses</h3>
+                    <div class="filter-row">
+                        <div class="form-group filter-group">
+                            <label for="filterCategory">Category</label>
+                            <select id="filterCategory">
+                                <option value="">All Categories</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group filter-group">
+                            <label for="minAmount">Min Amount</label>
+                            <input type="number" id="minAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        
+                        <div class="form-group filter-group">
+                            <label for="maxAmount">Max Amount</label>
+                            <input type="number" id="maxAmount" step="0.01" min="0" placeholder="Any">
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <button type="button" class="btn filter-btn" onclick="loadExpenses()">
+                            Apply Filters
+                        </button>
+                        <button type="button" class="btn reset-btn" onclick="resetFilters()">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+
+                <div id="message" class="message" style="display: none;"></div>
+                
+                <div class="expenses-list" id="expensesList">
+                    <div class="loading">Loading expenses...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="total-section">
+            <h2>Total Expenses</h2>
+            <div class="total-amount" id="totalAmount">$0.00</div>
+            <p id="expenseCount">0 expenses</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/expenses';
+        
+        // Load expenses on page load
+        document.addEventListener('DOMContentLoaded', loadExpenses);
+        
+        // Handle form submission
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const description = document.getElementById('description').value.trim();
+            const amount = document.getElementById('amount').value;
+            const category = document.getElementById('category').value;
+            
+            if (!description || !amount || !category) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ description, amount, category })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Expense added successfully!', 'success');
+                    document.getElementById('expenseForm').reset();
+                    loadExpenses();
+                } else {
+                    showMessage(data.error || 'Failed to add expense', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        });
+        
+        async function loadExpenses() {
+            const category = document.getElementById('filterCategory').value;
+            const minAmount = document.getElementById('minAmount').value;
+            const maxAmount = document.getElementById('maxAmount').value;
+            
+            // Build query string with filters
+            let queryParams = [];
+            if (category) queryParams.push(`category=${encodeURIComponent(category)}`);
+            if (minAmount) queryParams.push(`minAmount=${encodeURIComponent(minAmount)}`);
+            if (maxAmount) queryParams.push(`maxAmount=${encodeURIComponent(maxAmount)}`);
+            
+            const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+            
+            try {
+                const response = await fetch(`${API_BASE}${queryString}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayExpenses(data.data);
+                    document.getElementById('totalAmount').textContent = `$${data.total.toFixed(2)}`;
+                    document.getElementById('expenseCount').textContent = `${data.count} expense${data.count !== 1 ? 's' : ''}`;
+                }
+            } catch (error) {
+                showMessage('Failed to load expenses', 'error');
+            }
+        }
+        
+        function displayExpenses(expenses) {
+            const container = document.getElementById('expensesList');
+            
+            if (expenses.length === 0) {
+                container.innerHTML = '<div class="loading">No expenses found. Add your first expense!</div>';
+                return;
+            }
+            
+            container.innerHTML = expenses.map(expense => `
+                <div class="expense-item" data-id="${expense.id}">
+                    <div class="expense-info">
+                        <div class="expense-description">${expense.description}</div>
+                        <div class="expense-meta">
+                            <span>${expense.date}</span>
+                            <span class="expense-category">${expense.category}</span>
+                        </div>
+                    </div>
+                    <div class="expense-amount">$${expense.amount.toFixed(2)}</div>
+                    <button class="btn btn-delete" onclick="deleteExpense(${expense.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+        
+        async function deleteExpense(id) {
+            if (!confirm('Are you sure you want to delete this expense?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}?id=${id}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Expense deleted successfully!', 'success');
+                    loadExpenses();
+                } else {
+                    showMessage(data.error || 'Failed to delete expense', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please try again.', 'error');
+            }
+        }
+        
+        function resetFilters() {
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('minAmount').value = '';
+            document.getElementById('maxAmount').value = '';
+            loadExpenses();
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Load expenses every 30 seconds to keep data fresh
+        setInterval(loadExpenses, 30000);
+    </script>
+</body>
+</html>
